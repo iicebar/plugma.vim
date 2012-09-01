@@ -2,7 +2,7 @@
 "=============================================================================
 " FILE:plugma_utils.vim
 " AUTHOR:Tomoaki, Arakawa
-" Last Change:2012/09/01 19:05:49.
+" Last Change:2012/09/02 03:22:45.
 " Version:0.0-beta
 "
 "=============================================================================
@@ -18,14 +18,21 @@ let g:loaded_plugma_utils = 1
 "-----------------------------------------------------------------------------
 " Config
 "-----------------------------------------------------------------------------
-let g:plugma_util_GatesKeyBind     = 1 " default value is 0
+" Key-bind Support
+let g:plugma_util_GatesKeyBind     = 1 " default value is 1
 let g:plugma_util_DirectTabSelect  = 1 " default value is 1
 let g:plugma_util_EmaceLikeKeyBind = 0 " default value is 0
 " FileType Support.
-let g:plugma_util_AC_Clang = 1 " default value is 1
-let g:plugma_util_AC_Perl  = 1 " default value is 1
-let g:plugma_util_AC_PHP   = 1 " default value is 1
-let g:plugma_util_AC_Ruby  = 1 " default value is 1
+let g:plugma_util_AC_Clang         = 1 " default value is 1
+let g:plugma_util_AC_Perl          = 1 " default value is 1
+let g:plugma_util_AC_PHP           = 1 " default value is 1
+let g:plugma_util_AC_Ruby          = 1 " default value is 1
+
+" Status-Line Support
+let g:plugma_util_SL_Default       = 1 " default value is 1
+let g:plugma_util_SL_DateTime      = 1 " default value is 1
+let g:plugma_util_SL_CurDir        = 1 " default value is 1
+
 
 " Config 
 "-----------------------------------------------------------------------------
@@ -37,14 +44,14 @@ let g:plugma_util_SelectCmd = {}
 "	\ ['> フォルダのMRU', 'MRUDir'],
 "	\ ['> NetrwのMRU', 'MRUHistory']]
 let g:plugma_util_SelectCmd.guiopt = [
-      \ ['Toggle "guioptions"' , '']                                   , 
-      \ ['Toolbar'             , 'call Plugma_ToggleGuiOptions("T")']  , 
-      \ ['Menubar'             , 'call Plugma_ToggleGuiOptions("m")']  , 
-      \ ['Scrollbar - Right'   , 'call Plugma_ToggleGuiOptions("r")']  , 
-      \ ['Scrollbar - Left'    , 'call Plugma_ToggleGuiOptions("l")']  , 
-      \ ['Tabbar'              , 'call Plugma_ToggleGuiOptions("e")']  , 
-      \ ['Disable Menu'        , 'call Plugma_ToggleGuiOptions("g")']  , 
-      \ ['Simple Dialog'       , 'call Plugma_ToggleGuiOptions("c")']]
+      \ ['Toggle "guioptions"' , '']                      , 
+      \ ['Toolbar'             , 'PLToggleGuiOptions T']  , 
+      \ ['Menubar'             , 'PLToggleGuiOptions m']  , 
+      \ ['Scrollbar - Right'   , 'PLToggleGuiOptions r']  , 
+      \ ['Scrollbar - Left'    , 'PLToggleGuiOptions l']  , 
+      \ ['Tabbar'              , 'PLToggleGuiOptions e']  , 
+      \ ['Disable Menu'        , 'PLToggleGuiOptions g']  , 
+      \ ['Simple Dialog'       , 'PLToggleGuiOptions c']]
 
 " Global autocmd {{{2
 "-----------------------------------------------------------------------------
@@ -80,6 +87,7 @@ if g:plugma_util_GatesKeyBind == 1
   " Cut, Copy, Paste, Undo, Redo
   " This keymap is pick up from $VIMRUNTIME/mswin.vim
   " Mouse & Select
+  set clipboard=unnamed
   behave mswin
 
   " Cut
@@ -113,8 +121,8 @@ if g:plugma_util_EmaceLikeKeyBind == 1
 endif
 
 if has('gui_running')
-  nnoremap <silent> <Bslash><F5> :GuiOptionCtrl<CR>
-  nnoremap <silent> <Bslash><F11> :ToggleFullScreen<CR>
+  nnoremap <silent> <Bslash><F5> :PLSelectCmd guiopt<CR>
+  nnoremap <silent> <Bslash><F11> :PLToggleFullScreen<CR>
   nnoremap <C-O> :browse e<CR>
   nnoremap <C-R> :promptrepl<CR>
 endif
@@ -123,7 +131,7 @@ endif
 nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
 nnoremap <silent> <Space>B :b#<CR>
 nnoremap <silent> Q :hide<CR>
-nnoremap <silent> <C-I> :Plugma_ToggleIncSearch<CR>
+nnoremap <silent> <C-I> :PLToggleIncSearch<CR>
 
 " Split
 nnoremap <silent><Space>wa :only<CR>
@@ -140,6 +148,8 @@ nnoremap <silent><Space>ed :execute 'Vexplore ' . getcwd()<CR>
 nnoremap <silent><Space>et :execute 'Texplore ' . getcwd()<CR>
 
 " ChangeDirectory
+nnoremap <silent><Space>cd :PLChangeDirectory<CR>
+nnoremap <silent><Space>jd :PLMoveDirectory<CR>
 
 if g:plugma_util_DirectTabSelect == 1
   nnoremap <silent><Space>1 :tabnext 1<CR>
@@ -158,11 +168,22 @@ if g:plugma_util_DirectTabSelect == 1
     nnoremap <C-S-Tab> :tabprevious<CR>
   endif
 endif
+" Global Status-Line {{{2
+"-----------------------------------------------------------------------------
+if g:plugma_util_SL_Default == 1
+  set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%y%=R%l,C%v%V%6P\ \<\ %L
+endif
+if g:plugma_util_SL_DateTime == 1
+  let &statusline .= ' [%{strftime("%Y/%b/%d %X")}]' " 時計
+endif
+if g:plugma_util_SL_CurDir == 1
+  let &statusline .= ' [%{getcwd()}]'
+endif
 
 " FUNCTION {{{1
 " FUNCTION Plugma_ToggleFullScreen {{{2
 "-----------------------------------------------------------
-function! Plugma_ToggleFullScreen()
+function! s:Plugma_ToggleFullScreen()
   if has('win32')
     if &guioptions =~# 'C'
       set guioptions-=C
@@ -191,11 +212,11 @@ function! Plugma_ToggleFullScreen()
     endif
   endif
 endfunction
-command! ToggleFullScreen call ToggleFullScreen()
+command! PLToggleFullScreen call Plugma_ToggleFullScreen()
 
 " FUNCTION Plugma_ToggleGuiOptions {{{2
 "-----------------------------------------------------------
-function! Plugma_ToggleGuiOptions(flag_option)
+function! s:Plugma_ToggleGuiOptions(flag_option)
   if a:flag_option ==? 'T' " ツールバーの表示/非表示
     if &guioptions =~# 'T'
       set guioptions-=T
@@ -246,10 +267,11 @@ function! Plugma_ToggleGuiOptions(flag_option)
     echo 'bad parameter :' . a:flag_option
   endif
 endfunction
+command! -nargs=1 PLToggleGuiOptions call s:Plugma_ToggleGuiOptions(<q-args>)
 
 " FUNCTION Plugma_ToggleIncSearch {{{2
 "-----------------------------------------------------------
-function! Plugma_ToggleIncSearch()
+function! s:Plugma_ToggleIncSearch()
   if &incsearch == 1
     set incsearch!
     echohl ErrorMsg
@@ -262,11 +284,11 @@ function! Plugma_ToggleIncSearch()
     echohl None
   endif
 endfunction
-command! Plugma_ToggleIncSearch call Plugma_ToggleIncSearch()
+command! PLToggleIncSearch call s:Plugma_ToggleIncSearch()
 
 " FUNCTION Plugma_SelectCmd {{{2
 "-----------------------------------------------------------
-function! Plugma_SelectCmd(key)
+function! s:Plugma_SelectCmd(key)
   let a:viewlist = []
   let a:idx = 0
   let a:input = 0
@@ -293,25 +315,28 @@ function! Plugma_SelectCmd(key)
     return
   endif
 
-  echohl MoreMsg
   echo '> ' . a:slist[a:input][1]
-  echohl None
 
   execute a:slist[a:input][1]
 endfunction
 
-command! -nargs=1 SelectCmd 
-      \ call SelectCmd(<q-args>)
+function! s:Plugma_SelectCmd_Complete(ArgLead, CmdLine, CursorPos)
+  return keys(g:plugma_util_SelectCmd)
+endfunction
+
+command! -nargs=1 -complete=customlist,s:Plugma_SelectCmd_Complete PLSelectCmd 
+      \ call s:Plugma_SelectCmd(<q-args>)
+
 " FUNCTION CD {{{2
-function! Plugma_ChangeDirectory()
+function! s:Plugma_ChangeDirectory()
   let a:cd_path = expand("%:p:h")
   execute 'cd ' . a:cd_path
   echo '>cd ' . a:cd_path
 endfunction
-command! Pcd call Plugma_ChangeDirectory()
+command! PLChangeDirectory call s:Plugma_ChangeDirectory()
 
-function! Plugma_MoveDirectory()
-  let a:mv_path = input('>cd ' , expand("%:p:h") , "dir")
+function! s:Plugma_MoveDirectory()
+  let a:mv_path = input('Plz input Dir >' , expand("%:p:h") , "dir")
   echo "\n"
   if strlen(a:mv_path) < 1
     echohl WarningMsg
@@ -320,7 +345,7 @@ function! Plugma_MoveDirectory()
     return
   endif
 
-  if isdirectory(a:mv_path)
+  if !isdirectory(a:mv_path)
     echohl ErrorMsg
     echo "Not Find directory!"
     echohl None
@@ -328,10 +353,8 @@ function! Plugma_MoveDirectory()
   endif
 
   execute 'cd ' . a:mv_path
-  echohl MoreMsg
-  echo '>cd ' . a:cd_path
-  echohl None
+  echo '>cd ' . a:mv_path
 endfunction
-command! MoveCD call Plugma_MoveDirectory()
+command! PLMoveDirectory call s:Plugma_MoveDirectory()
 " }}}1
 " vim:set foldenable foldmethod=marker:
