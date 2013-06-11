@@ -2,7 +2,7 @@
 "=============================================================================
 " FILE:plugma_utils.vim
 " AUTHOR:Tomoaki, Arakawa
-" Last Change:2012/09/02 03:22:45.
+" Last Change:2013/06/12 01:57:10.
 " Version:0.0-beta
 "
 "=============================================================================
@@ -13,7 +13,7 @@ endif
 let g:loaded_plugma_utils = 1
 
 " }}}1
-" Global Settings {{{1
+" GLOBAL SETTINGS {{{1
 " Global Variable {{{2
 "-----------------------------------------------------------------------------
 " Config
@@ -31,12 +31,20 @@ let g:plugma_util_AC_Ruby          = 1 " default value is 1
 " Status-Line Support
 let g:plugma_util_SL_Default       = 1 " default value is 1
 let g:plugma_util_SL_DateTime      = 1 " default value is 1
-let g:plugma_util_SL_CurDir        = 1 " default value is 1
+let g:plugma_util_SL_CurDir        = 0 " default value is 0
 
+" Hilight Support
+let g:plugma_util_HL_Simple        = 1 " default value is 1
 
+" Tabline Support
+let g:plugma_util_TL_Terminal      = 0 " default value is 0
+
+" Function Support
+let g:plugma_util_FUNC_Quit        = 0 " default value is 0
 " Config 
 "-----------------------------------------------------------------------------
 let g:plugma_util_SelectCmd = {}
+
 " Format Sample.
 "let g:plugma_util_SelectCmd.mru = [
 "	\ ['Sample MRUの選択リスト', ''],
@@ -44,7 +52,7 @@ let g:plugma_util_SelectCmd = {}
 "	\ ['> フォルダのMRU', 'MRUDir'],
 "	\ ['> NetrwのMRU', 'MRUHistory']]
 let g:plugma_util_SelectCmd.guiopt = [
-      \ ['Toggle "guioptions"' , '']                      , 
+      \ ['Toggle "guioptions".' , '']                      , 
       \ ['Toolbar'             , 'PLToggleGuiOptions T']  , 
       \ ['Menubar'             , 'PLToggleGuiOptions m']  , 
       \ ['Scrollbar - Right'   , 'PLToggleGuiOptions r']  , 
@@ -52,7 +60,17 @@ let g:plugma_util_SelectCmd.guiopt = [
       \ ['Tabbar'              , 'PLToggleGuiOptions e']  , 
       \ ['Disable Menu'        , 'PLToggleGuiOptions g']  , 
       \ ['Simple Dialog'       , 'PLToggleGuiOptions c']]
-
+let g:plugma_util_SelectCmd.fileencoding = [
+	\ ['Change File Encoding.' , '']                           , 
+	\ ['EUC-JP'                , 'set fileencoding=euc-jp']    , 
+	\ ['SHIFT-JIS'             , 'set fileencoding=shift_jis'] , 
+	\ ['UTF-8'                 , 'set fileencoding=utf-8']]
+let g:plugma_util_SelectCmd.fileformat = [
+	\ ['Change File Format.' , '']                     , 
+	\ ['DOS(CR+LF)'          , 'set fileformat=dos']   , 
+	\ ['MAC(CR)'             , 'set fileformat=mac']   , 
+	\ ['UNIX(LF)'            , 'set fileformat=unix']]
+" }}}2
 " Global autocmd {{{2
 "-----------------------------------------------------------------------------
 if g:plugma_util_AC_Perl == 1
@@ -71,7 +89,7 @@ if g:plugma_util_AC_PHP == 1
   autocmd FileType php :map <F3> <Esc>:!php -l %<CR>
   autocmd FileType php :map <F4> <Esc>:!php %<CR>
 endif
-
+" }}}2
 " Global Keymap {{{2
 "-----------------------------------------------------------------------------
 " Space & Moving
@@ -130,7 +148,7 @@ endif
 " System Util
 nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
 nnoremap <silent> <Space>B :b#<CR>
-nnoremap <silent> Q :hide<CR>
+nnoremap <silent> Q :PLQuit<CR>
 nnoremap <silent> <C-I> :PLToggleIncSearch<CR>
 
 " Split
@@ -151,6 +169,7 @@ nnoremap <silent><Space>et :execute 'Texplore ' . getcwd()<CR>
 nnoremap <silent><Space>cd :PLChangeDirectory<CR>
 nnoremap <silent><Space>jd :PLMoveDirectory<CR>
 
+" Fast switching tab
 if g:plugma_util_DirectTabSelect == 1
   nnoremap <silent><Space>1 :tabnext 1<CR>
   nnoremap <silent><Space>2 :tabnext 2<CR>
@@ -162,28 +181,60 @@ if g:plugma_util_DirectTabSelect == 1
   nnoremap <silent><Space>8 :tabnext 8<CR>
   nnoremap <silent><Space>9 :tabnext 9<CR>
   nnoremap <silent><Space>0 :tabnext 10<CR>
-
-  if has('gui_running')
-    nnoremap <C-Tab> :tabnext<CR>
-    nnoremap <C-S-Tab> :tabprevious<CR>
-  endif
 endif
+
+" GUI-Editor like
+if has('gui_running')
+  nnoremap <C-Tab> :tabnext<CR>
+  nnoremap <C-S-Tab> :tabprevious<CR>
+endif
+
+" Filepath complement
+cnoremap <c-x> <c-r>=expand('%:p:h')<cr>/
+
+" Show directory
+nnoremap <silent><Space>pwd :pwd<CR>
+" Show marks
+nnoremap <silent><Space>vm :marks<CR>
+" Show Registers
+nnoremap <silent><Space>vr :registers<CR>
+
+" }}}2
 " Global Status-Line {{{2
 "-----------------------------------------------------------------------------
 if g:plugma_util_SL_Default == 1
   set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%y%=R%l,C%v%V%6P\ \<\ %L
 endif
 if g:plugma_util_SL_DateTime == 1
-  let &statusline .= ' [%{strftime("%Y/%b/%d %X")}]' " 時計
+  let &statusline .= ' [%{strftime("%Y/%m/%d_%H:%M")}]'
 endif
 if g:plugma_util_SL_CurDir == 1
   let &statusline .= ' [%{getcwd()}]'
 endif
-
+" }}}2
+" Global Highlight {{{2
+if g:plugma_util_HL_Simple == 1
+  " Terminal Color
+  hi TabLine        ctermfg=15      ctermbg=0       cterm=none
+  hi TabLineSel     ctermfg=2       ctermbg=0       cterm=bold
+  hi TabLineFill    ctermfg=0       ctermbg=8       cterm=none
+  hi StatusLineNC   ctermfg=0       ctermbg=8       cterm=none
+  hi StatusLine     ctermfg=0       ctermbg=15      cterm=none
+endif
+" }}}2
+" Global Tab-Line {{{2
+if g:plugma_util_TL_Terminal == 1
+  if !has('gui_running')
+    set tabline=%!MyTabLine()
+    set showtabline=2
+  endif
+endif
+" }}}2
+" }}}1
 " FUNCTION {{{1
-" FUNCTION Plugma_ToggleFullScreen {{{2
+" FUNCTION s:PlugmaToggleFullScreen {{{2
 "-----------------------------------------------------------
-function! s:Plugma_ToggleFullScreen()
+function! s:PlugmaToggleFullScreen()
   if has('win32')
     if &guioptions =~# 'C'
       set guioptions-=C
@@ -212,11 +263,10 @@ function! s:Plugma_ToggleFullScreen()
     endif
   endif
 endfunction
-command! PLToggleFullScreen call Plugma_ToggleFullScreen()
-
-" FUNCTION Plugma_ToggleGuiOptions {{{2
+" }}}2
+" FUNCTION s:PlugmaToggleGuiOptions {{{2
 "-----------------------------------------------------------
-function! s:Plugma_ToggleGuiOptions(flag_option)
+function! s:PlugmaToggleGuiOptions(flag_option)
   if a:flag_option ==? 'T' " ツールバーの表示/非表示
     if &guioptions =~# 'T'
       set guioptions-=T
@@ -267,11 +317,10 @@ function! s:Plugma_ToggleGuiOptions(flag_option)
     echo 'bad parameter :' . a:flag_option
   endif
 endfunction
-command! -nargs=1 PLToggleGuiOptions call s:Plugma_ToggleGuiOptions(<q-args>)
-
-" FUNCTION Plugma_ToggleIncSearch {{{2
+" }}}2
+" FUNCTION s:PlugmaToggleIncSearch {{{2
 "-----------------------------------------------------------
-function! s:Plugma_ToggleIncSearch()
+function! s:PlugmaToggleIncSearch()
   if &incsearch == 1
     set incsearch!
     echohl ErrorMsg
@@ -284,11 +333,10 @@ function! s:Plugma_ToggleIncSearch()
     echohl None
   endif
 endfunction
-command! PLToggleIncSearch call s:Plugma_ToggleIncSearch()
-
-" FUNCTION Plugma_SelectCmd {{{2
+" }}}2
+" FUNCTION s:PlugmaSelectCmd {{{2
 "-----------------------------------------------------------
-function! s:Plugma_SelectCmd(key)
+function! s:PlugmaSelectCmd(key)
   let a:viewlist = []
   let a:idx = 0
   let a:input = 0
@@ -306,8 +354,12 @@ function! s:Plugma_SelectCmd(key)
   endwhile
 
   let a:input = inputlist(a:viewlist)
-  echo "\n"
 
+  if a:input == 0
+    return
+  endif
+
+  echo "\n"
   if a:input < 1 || a:input > len(a:slist)
     echohl ErrorMsg
     echo 'Selected-Number('.a:input.') is range over.(0-' . (len(a:slist) - 1) . ')'
@@ -319,24 +371,22 @@ function! s:Plugma_SelectCmd(key)
 
   execute a:slist[a:input][1]
 endfunction
-
-function! s:Plugma_SelectCmd_Complete(ArgLead, CmdLine, CursorPos)
+" }}}2
+" FUNCTION s:PlugmaSelectCmdComplete {{{2
+function! s:PlugmaSelectCmdComplete(ArgLead, CmdLine, CursorPos)
   return keys(g:plugma_util_SelectCmd)
 endfunction
-
-command! -nargs=1 -complete=customlist,s:Plugma_SelectCmd_Complete PLSelectCmd 
-      \ call s:Plugma_SelectCmd(<q-args>)
-
-" FUNCTION CD {{{2
-function! s:Plugma_ChangeDirectory()
+" }}}2
+" FUNCTION s:PlugmaChangeDirectory {{{2
+function! s:PlugmaChangeDirectory()
   let a:cd_path = expand("%:p:h")
   execute 'cd ' . a:cd_path
   echo '>cd ' . a:cd_path
 endfunction
-command! PLChangeDirectory call s:Plugma_ChangeDirectory()
-
-function! s:Plugma_MoveDirectory()
-  let a:mv_path = input('Plz input Dir >' , expand("%:p:h") , "dir")
+" }}}2
+" FUNCTION s:PlugmaMoveDirectory {{{2
+function! s:PlugmaMoveDirectory()
+  let a:mv_path = input('Plz Input Dir > ' , expand("%:p:h") , "dir")
   echo "\n"
   if strlen(a:mv_path) < 1
     echohl WarningMsg
@@ -355,6 +405,76 @@ function! s:Plugma_MoveDirectory()
   execute 'cd ' . a:mv_path
   echo '>cd ' . a:mv_path
 endfunction
-command! PLMoveDirectory call s:Plugma_MoveDirectory()
+" }}}2
+" FUNCTION s:PlugmaTabLabel {{{2
+function! s:PlugmaTabLabel(n)
+  " tabline にカレントウィンドウのバッファ名表示させたい
+  let buflist = tabpagebuflist(a:n)
+  " のでタブのなかのカレントウィンドの番号を使う
+  let winnr = tabpagewinnr(a:n)
+
+  " あとタブのなかにあるウィンドウ数表示させたい
+  let buflen = tabpagewinnr(a:n, '$')
+
+  " ファイル名を表示させたい(ながいのは困るのでファイル名のぶんだけ)
+  let bufname = fnamemodify(bufname(buflist[winnr - 1]), ':t')
+
+  " タブの番号表示させたい(これが一番の目的)
+  let label = a:n . ": "
+
+  " バッファ名、なければ No name に
+  let label .= bufname == '' ? 'No name' : bufname
+
+  " うえでとったウィンドの数をもってくる
+  let label .= '[' . buflen . ']'
+
+  " tabline に表示させる文字列返す
+  return label
+endfunction
+" }}}2
+" FUNCTION s:PlugmaTabLine {{{2
+function! s:PlugmaTabLine()
+  let s = ''
+  for i in range(tabpagenr('$'))
+    if i + 1 == tabpagenr()
+      let s .= '%#TabLineSel#'
+    else
+      let s .= '%#TabLine#'
+    endif
+    let s .= '%' . (i + 1) . 'T'
+    let s .= ' %{s:PlugmaTabLabel(' . (i + 1) . ')} '
+  endfor
+  let s .= '%#TabLineFill#%T'
+  if tabpagenr('$') > 1
+    let s .= '%=%#TabLine#%999Xx'
+  endif
+  return s
+endfunction
+" }}}2
+" FUNCTION s:PlugmaQuit {{{2
+function! s:PlugmaQuit()
+  if (tabpagenr("$") == 1) && (winnr("$") == 1)
+    if g:plugma_util_FUNC_Quit == 1
+      quit
+    else
+      echohl ErrorMsg
+      echo 'Last window is not closed.'
+      echohl None
+    endif
+  else
+    hide
+  endif
+endfunction
+" }}}2
+" }}}1
+" COMMAND {{{1
+command! -nargs=0 PLToggleFullScreen call s:PlugmaToggleFullScreen()
+command! -nargs=1 PLToggleGuiOptions call s:PlugmaToggleGuiOptions(<q-args>)
+command! -nargs=0 PLToggleIncSearch call s:PlugmaToggleIncSearch()
+command! -nargs=1 -complete=customlist,s:PlugmaSelectCmdComplete PLSelectCmd 
+      \ call s:PlugmaSelectCmd(<q-args>)
+command! -nargs=0 PLChangeDirectory call s:PlugmaChangeDirectory()
+command! -nargs=0 PLMoveDirectory call s:PlugmaMoveDirectory()
+command! -nargs=0 PLQuit call s:PlugmaQuit()
 " }}}1
 " vim:set foldenable foldmethod=marker:
