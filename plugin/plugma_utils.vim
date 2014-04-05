@@ -2,7 +2,7 @@
 "=============================================================================
 " FILE:plugma_utils.vim
 " AUTHOR:Tomoaki, Arakawa
-" Last Change:2013/06/12 01:57:10.
+" Last Change:06-Apr-2014.
 " Version:0.0-beta
 "
 "=============================================================================
@@ -379,9 +379,8 @@ endfunction
 " }}}2
 " FUNCTION s:PlugmaChangeDirectory {{{2
 function! s:PlugmaChangeDirectory()
-  let a:cd_path = expand("%:p:h")
-  execute 'cd ' . a:cd_path
-  echo '>cd ' . a:cd_path
+  cd %:h
+  echo '>cd ' . expand('%:h')
 endfunction
 " }}}2
 " FUNCTION s:PlugmaMoveDirectory {{{2
