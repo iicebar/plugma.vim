@@ -1,16 +1,16 @@
 " vim:set ts=4 sts=2 sw=2 tw=0 et:
 "=============================================================================
-" FILE:plugma_utils.vim
+" FILE:plugma.vim
 " AUTHOR:Tomoaki, Arakawa
 " Last Change:01-Aug-2014.
 " Version:0.0-beta
 "
 "=============================================================================
 " LOAD GUARD {{{1
-if exists('g:loaded_plugma_utils')
+if exists('g:loaded_plugma')
   finish
 endif
-let g:loaded_plugma_utils = 1
+let g:loaded_plugma = 1
 
 " }}}1
 " GLOBAL SETTINGS {{{1
@@ -19,39 +19,39 @@ let g:loaded_plugma_utils = 1
 " Config
 "-----------------------------------------------------------------------------
 " Key-bind Support
-let g:plugma_util_GatesKeyBind     = 1 " default value is 1
-let g:plugma_util_DirectTabSelect  = 1 " default value is 1
-let g:plugma_util_EmaceLikeKeyBind = 0 " default value is 0
+let g:plugma_GatesKeyBind     = 1 " default value is 1
+let g:plugma_DirectTabSelect  = 1 " default value is 1
+let g:plugma_EmaceLikeKeyBind = 0 " default value is 0
 " FileType Support.
-let g:plugma_util_AC_Clang         = 1 " default value is 1
-let g:plugma_util_AC_Perl          = 1 " default value is 1
-let g:plugma_util_AC_PHP           = 1 " default value is 1
-let g:plugma_util_AC_Ruby          = 1 " default value is 1
+let g:plugma_AC_Clang         = 1 " default value is 1
+let g:plugma_AC_Perl          = 1 " default value is 1
+let g:plugma_AC_PHP           = 1 " default value is 1
+let g:plugma_AC_Ruby          = 1 " default value is 1
 
 " Status-Line Support
-let g:plugma_util_SL_Default       = 1 " default value is 1
-let g:plugma_util_SL_DateTime      = 1 " default value is 1
-let g:plugma_util_SL_CurDir        = 0 " default value is 0
+let g:plugma_SL_Default       = 1 " default value is 1
+let g:plugma_SL_DateTime      = 1 " default value is 1
+let g:plugma_SL_CurDir        = 0 " default value is 0
 
 " Hilight Support
-let g:plugma_util_HL_Simple        = 1 " default value is 1
+let g:plugma_HL_Simple        = 1 " default value is 1
 
 " Tabline Support
-let g:plugma_util_TL_Terminal      = 0 " default value is 0
+let g:plugma_TL_Terminal      = 0 " default value is 0
 
 " Function Support
-let g:plugma_util_FUNC_Quit        = 0 " default value is 0
+let g:plugma_FUNC_Quit        = 0 " default value is 0
 " Config 
 "-----------------------------------------------------------------------------
-let g:plugma_util_SelectCmd = {}
+let g:plugma_SelectCmd = {}
 
 " Format Sample.
-"let g:plugma_util_SelectCmd.mru = [
+"let g:plugma_SelectCmd.mru = [
 "	\ ['Sample MRUの選択リスト', ''],
 "	\ ['> ファイルのMRU', 'MRUFile'],
 "	\ ['> フォルダのMRU', 'MRUDir'],
 "	\ ['> NetrwのMRU', 'MRUHistory']]
-let g:plugma_util_SelectCmd.guiopt = [
+let g:plugma_SelectCmd.guiopt = [
       \ ['Toggle "guioptions".' , '']                      , 
       \ ['Toolbar'             , 'PLToggleGuiOptions T']  , 
       \ ['Menubar'             , 'PLToggleGuiOptions m']  , 
@@ -60,12 +60,12 @@ let g:plugma_util_SelectCmd.guiopt = [
       \ ['Tabbar'              , 'PLToggleGuiOptions e']  , 
       \ ['Disable Menu'        , 'PLToggleGuiOptions g']  , 
       \ ['Simple Dialog'       , 'PLToggleGuiOptions c']]
-let g:plugma_util_SelectCmd.fileencoding = [
+let g:plugma_SelectCmd.fileencoding = [
 	\ ['Change File Encoding.' , '']                           , 
 	\ ['EUC-JP'                , 'set fileencoding=euc-jp']    , 
 	\ ['SHIFT-JIS'             , 'set fileencoding=shift_jis'] , 
 	\ ['UTF-8'                 , 'set fileencoding=utf-8']]
-let g:plugma_util_SelectCmd.fileformat = [
+let g:plugma_SelectCmd.fileformat = [
 	\ ['Change File Format.' , '']                     , 
 	\ ['DOS(CR+LF)'          , 'set fileformat=dos']   , 
 	\ ['MAC(CR)'             , 'set fileformat=mac']   , 
@@ -73,19 +73,19 @@ let g:plugma_util_SelectCmd.fileformat = [
 " }}}2
 " Global autocmd {{{2
 "-----------------------------------------------------------------------------
-if g:plugma_util_AC_Perl == 1
+if g:plugma_AC_Perl == 1
   autocmd FileType perl :map <F3> <Esc>:!perl -cw %<CR>
   autocmd FileType perl :map <F4> <Esc>:!perl %<CR>
 endif
-if g:plugma_util_AC_Clang == 1
+if g:plugma_AC_Clang == 1
   autocmd FileType c :map <F3> <Esc>:shell<CR>
   autocmd FileType c :map <F4> <Esc>:make<CR>
 endif
-if g:plugma_util_AC_Ruby == 1
+if g:plugma_AC_Ruby == 1
   autocmd FileType ruby :map <F3> <Esc>:!ruby -c %<CR>
   autocmd FileType ruby :map <F4> <Esc>:!ruby %<CR>
 endif
-if g:plugma_util_AC_PHP == 1
+if g:plugma_AC_PHP == 1
   autocmd FileType php :map <F3> <Esc>:!php -l %<CR>
   autocmd FileType php :map <F4> <Esc>:!php %<CR>
 endif
@@ -101,7 +101,7 @@ nnoremap <silent><Space><UP> gk
 nnoremap <silent><Space><DOWN> gj
 
 " Gates Keybind
-if g:plugma_util_GatesKeyBind == 1
+if g:plugma_GatesKeyBind == 1
   " Cut, Copy, Paste, Undo, Redo
   " This keymap is pick up from $VIMRUNTIME/mswin.vim
   " Mouse & Select
@@ -131,7 +131,7 @@ if g:plugma_util_GatesKeyBind == 1
 endif
 
 " Emacs Keybind
-if g:plugma_util_EmaceLikeKeyBind == 1
+if g:plugma_EmaceLikeKeyBind == 1
   nnoremap <C-X>1 :only<CR>
   nnoremap <C-X>2 :split<CR>
   nnoremap <C-X>3 :vsplit<CR>
@@ -170,7 +170,7 @@ nnoremap <silent><Space>cd :PLChangeDirectory<CR>
 nnoremap <silent><Space>jd :PLMoveDirectory<CR>
 
 " Fast switching tab
-if g:plugma_util_DirectTabSelect == 1
+if g:plugma_DirectTabSelect == 1
   nnoremap <silent><Space>1 :tabnext 1<CR>
   nnoremap <silent><Space>2 :tabnext 2<CR>
   nnoremap <silent><Space>3 :tabnext 3<CR>
@@ -202,18 +202,18 @@ nnoremap <silent><Space>vr :registers<CR>
 " }}}2
 " Global Status-Line {{{2
 "-----------------------------------------------------------------------------
-if g:plugma_util_SL_Default == 1
+if g:plugma_SL_Default == 1
   set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%y%=R%l,C%v%V%6P\ \<\ %L
 endif
-if g:plugma_util_SL_DateTime == 1
+if g:plugma_SL_DateTime == 1
   let &statusline .= ' [%{strftime("%Y/%m/%d_%H:%M")}]'
 endif
-if g:plugma_util_SL_CurDir == 1
+if g:plugma_SL_CurDir == 1
   let &statusline .= ' [%{getcwd()}]'
 endif
 " }}}2
 " Global Highlight {{{2
-if g:plugma_util_HL_Simple == 1
+if g:plugma_HL_Simple == 1
   " Terminal Color
   hi TabLine        ctermfg=15      ctermbg=0       cterm=none
   hi TabLineSel     ctermfg=2       ctermbg=0       cterm=bold
@@ -223,7 +223,7 @@ if g:plugma_util_HL_Simple == 1
 endif
 " }}}2
 " Global Tab-Line {{{2
-if g:plugma_util_TL_Terminal == 1
+if g:plugma_TL_Terminal == 1
   if !has('gui_running')
     set tabline=%!MyTabLine()
     set showtabline=2
@@ -340,7 +340,7 @@ function! s:PlugmaSelectCmd(key)
   let a:viewlist = []
   let a:idx = 0
   let a:input = 0
-  let a:slist = g:plugma_util_SelectCmd[a:key]
+  let a:slist = g:plugma_SelectCmd[a:key]
   let a:head = ''
 
   while a:idx < len(a:slist)
@@ -374,7 +374,7 @@ endfunction
 " }}}2
 " FUNCTION s:PlugmaSelectCmdComplete {{{2
 function! s:PlugmaSelectCmdComplete(ArgLead, CmdLine, CursorPos)
-  return keys(g:plugma_util_SelectCmd)
+  return keys(g:plugma_SelectCmd)
 endfunction
 " }}}2
 " FUNCTION s:PlugmaChangeDirectory {{{2
@@ -453,7 +453,7 @@ endfunction
 " FUNCTION s:PlugmaQuit {{{2
 function! s:PlugmaQuit()
   if (tabpagenr("$") == 1) && (winnr("$") == 1)
-    if g:plugma_util_FUNC_Quit == 1
+    if g:plugma_FUNC_Quit == 1
       quit
     else
       echohl ErrorMsg
