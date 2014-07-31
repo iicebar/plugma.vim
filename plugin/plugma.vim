@@ -2,7 +2,7 @@
 "=============================================================================
 " FILE:plugma_utils.vim
 " AUTHOR:Tomoaki, Arakawa
-" Last Change:06-Apr-2014.
+" Last Change:01-Aug-2014.
 " Version:0.0-beta
 "
 "=============================================================================
@@ -405,8 +405,8 @@ function! s:PlugmaMoveDirectory()
   echo '>cd ' . a:mv_path
 endfunction
 " }}}2
-" FUNCTION s:PlugmaTabLabel {{{2
-function! s:PlugmaTabLabel(n)
+" FUNCTION g:PlugmaTabLabel {{{2
+function! g:PlugmaTabLabel(n)
   " tabline にカレントウィンドウのバッファ名表示させたい
   let buflist = tabpagebuflist(a:n)
   " のでタブのなかのカレントウィンドの番号を使う
@@ -431,8 +431,8 @@ function! s:PlugmaTabLabel(n)
   return label
 endfunction
 " }}}2
-" FUNCTION s:PlugmaTabLine {{{2
-function! s:PlugmaTabLine()
+" FUNCTION g:PlugmaTabLine {{{2
+function! g:PlugmaTabLine()
   let s = ''
   for i in range(tabpagenr('$'))
     if i + 1 == tabpagenr()
@@ -441,7 +441,7 @@ function! s:PlugmaTabLine()
       let s .= '%#TabLine#'
     endif
     let s .= '%' . (i + 1) . 'T'
-    let s .= ' %{s:PlugmaTabLabel(' . (i + 1) . ')} '
+    let s .= ' %{g:PlugmaTabLabel(' . (i + 1) . ')} '
   endfor
   let s .= '%#TabLineFill#%T'
   if tabpagenr('$') > 1
