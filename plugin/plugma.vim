@@ -1,9 +1,9 @@
-" vim:set ts=4 sts=2 sw=2 tw=0 et:
+" vim:set ts=4 sts=2 sw=2 tw=0 et foldenable foldmethod=marker:
 "=============================================================================
 " FILE:plugma.vim
 " AUTHOR:Tomoaki, Arakawa
-" Last Change:01-Aug-2014.
-" Version:0.0-beta
+" Last Change:2014/08/02 21:36:36.
+" Version:0.1
 "
 "=============================================================================
 " LOAD GUARD {{{1
@@ -214,27 +214,27 @@ endif
 " }}}2
 " Global Highlight {{{2
 if g:plugma_HL_Simple == 1
-  " Terminal Color
-  hi TabLine        ctermfg=15      ctermbg=0       cterm=none
-  hi TabLineSel     ctermfg=2       ctermbg=0       cterm=bold
-  hi TabLineFill    ctermfg=0       ctermbg=8       cterm=none
-  hi StatusLineNC   ctermfg=0       ctermbg=8       cterm=none
-  hi StatusLine     ctermfg=0       ctermbg=15      cterm=none
+  if !has('gui_running')
+    " Terminal Color
+    hi TabLine        ctermfg=15      ctermbg=0       cterm=none
+    hi TabLineSel     ctermfg=2       ctermbg=0       cterm=bold
+    hi TabLineFill    ctermfg=0       ctermbg=8       cterm=none
+    hi StatusLineNC   ctermfg=0       ctermbg=8       cterm=none
+    hi StatusLine     ctermfg=0       ctermbg=15      cterm=none
+  endif
 endif
 " }}}2
 " Global Tab-Line {{{2
 if g:plugma_TL_Terminal == 1
   if !has('gui_running')
-    set tabline=%!MyTabLine()
+    set tabline=%!g:PlugmaTabLine()
     set showtabline=2
   endif
 endif
 " }}}2
 " }}}1
 " FUNCTION {{{1
-" FUNCTION s:PlugmaToggleFullScreen {{{2
-"-----------------------------------------------------------
-function! s:PlugmaToggleFullScreen()
+function! s:PlugmaToggleFullScreen() "{{{2
   if has('win32')
     if &guioptions =~# 'C'
       set guioptions-=C
@@ -262,65 +262,63 @@ function! s:PlugmaToggleFullScreen()
       set fullscreen
     endif
   endif
-endfunction
-" }}}2
-" FUNCTION s:PlugmaToggleGuiOptions {{{2
-"-----------------------------------------------------------
-function! s:PlugmaToggleGuiOptions(flag_option)
-  if a:flag_option ==? 'T' " ツールバーの表示/非表示
-    if &guioptions =~# 'T'
-      set guioptions-=T
+endfunction "}}}2
+function! s:PlugmaToggleGuiOptions(flag_option) "{{{2
+  if has('gui_running')
+    if a:flag_option ==? 'T' " ツールバーの表示/非表示
+      if &guioptions =~# 'T'
+        set guioptions-=T
+      else
+        set guioptions+=T
+      endif
+    elseif a:flag_option ==? 'm' "メニューバーの表示/非表示
+      if &guioptions =~# 'm'
+        set guioptions-=m
+      else
+        set guioptions+=m
+      endif
+    elseif a:flag_option ==? 'r' "右スクロールバーの表示/非表示
+      if &guioptions =~# 'r'
+        set guioptions-=r
+        set guioptions-=R
+      else
+        set guioptions+=r
+        set guioptions+=R
+      endif
+    elseif a:flag_option ==? 'l' "左スクロールバーの表示/非表示
+      if &guioptions =~# 'l'
+        set guioptions-=l
+        set guioptions-=L
+      else
+        set guioptions+=l
+        set guioptions+=L
+      endif
+    elseif a:flag_option ==? 'e' "tabをGUIでだす
+      if &guioptions =~# 'e'
+        set guioptions-=e
+      else
+        set guioptions+=e
+      endif
+    elseif a:flag_option ==? 'g' "使えないボタンをグレーアウト
+      if &guioptions =~# 'g'
+        set guioptions-=g
+      else
+        set guioptions+=g
+      endif
+    elseif a:flag_option ==? 'c' "easy question is not GUI
+      if &guioptions =~# 'c'
+        set guioptions-=c
+      else
+        set guioptions+=c
+      endif
     else
-      set guioptions+=T
-    endif
-  elseif a:flag_option ==? 'm' "メニューバーの表示/非表示
-    if &guioptions =~# 'm'
-      set guioptions-=m
-    else
-      set guioptions+=m
-    endif
-  elseif a:flag_option ==? 'r' "右スクロールバーの表示/非表示
-    if &guioptions =~# 'r'
-      set guioptions-=r
-      set guioptions-=R
-    else
-      set guioptions+=r
-      set guioptions+=R
-    endif
-  elseif a:flag_option ==? 'l' "左スクロールバーの表示/非表示
-    if &guioptions =~# 'l'
-      set guioptions-=l
-      set guioptions-=L
-    else
-      set guioptions+=l
-      set guioptions+=L
-    endif
-  elseif a:flag_option ==? 'e' "tabをGUIでだす
-    if &guioptions =~# 'e'
-      set guioptions-=e
-    else
-      set guioptions+=e
-    endif
-  elseif a:flag_option ==? 'g' "使えないボタンをグレーアウト
-    if &guioptions =~# 'g'
-      set guioptions-=g
-    else
-      set guioptions+=g
-    endif
-  elseif a:flag_option ==? 'c' "easy question is not GUI
-    if &guioptions =~# 'c'
-      set guioptions-=c
-    else
-      set guioptions+=c
+      echo 'bad parameter :' . a:flag_option
     endif
   else
-    echo 'bad parameter :' . a:flag_option
+    echo 'not gui_running.'
   endif
-endfunction
-" }}}2
-" FUNCTION s:PlugmaToggleIncSearch {{{2
-"-----------------------------------------------------------
-function! s:PlugmaToggleIncSearch()
+endfunction "}}}2
+function! s:PlugmaToggleIncSearch() "{{{2
   if &incsearch == 1
     set incsearch!
     echohl ErrorMsg
@@ -332,11 +330,8 @@ function! s:PlugmaToggleIncSearch()
     echo 'Incsearch ON!'
     echohl None
   endif
-endfunction
-" }}}2
-" FUNCTION s:PlugmaSelectCmd {{{2
-"-----------------------------------------------------------
-function! s:PlugmaSelectCmd(key)
+endfunction "}}}2
+function! s:PlugmaSelectCmd(key) "{{{2
   let a:viewlist = []
   let a:idx = 0
   let a:input = 0
@@ -370,21 +365,15 @@ function! s:PlugmaSelectCmd(key)
   echo '> ' . a:slist[a:input][1]
 
   execute a:slist[a:input][1]
-endfunction
-" }}}2
-" FUNCTION s:PlugmaSelectCmdComplete {{{2
-function! s:PlugmaSelectCmdComplete(ArgLead, CmdLine, CursorPos)
+endfunction "}}}2
+function! s:PlugmaSelectCmdComplete(ArgLead, CmdLine, CursorPos) "{{{2
   return keys(g:plugma_SelectCmd)
-endfunction
-" }}}2
-" FUNCTION s:PlugmaChangeDirectory {{{2
-function! s:PlugmaChangeDirectory()
+endfunction "}}}2
+function! s:PlugmaChangeDirectory() "{{{2
   cd %:h
   echo '>cd ' . expand('%:h')
-endfunction
-" }}}2
-" FUNCTION s:PlugmaMoveDirectory {{{2
-function! s:PlugmaMoveDirectory()
+endfunction "}}}2
+function! s:PlugmaMoveDirectory() "{{{2
   let a:mv_path = input('Plz Input Dir > ' , expand("%:p:h") , "dir")
   echo "\n"
   if strlen(a:mv_path) < 1
@@ -403,10 +392,21 @@ function! s:PlugmaMoveDirectory()
 
   execute 'cd ' . a:mv_path
   echo '>cd ' . a:mv_path
-endfunction
-" }}}2
-" FUNCTION g:PlugmaTabLabel {{{2
-function! g:PlugmaTabLabel(n)
+endfunction "}}}2
+function! s:PlugmaQuit() "{{{2
+  if (tabpagenr("$") == 1) && (winnr("$") == 1)
+    if g:plugma_FUNC_Quit == 1
+      quit
+    else
+      echohl ErrorMsg
+      echo 'Last window is not closed.'
+      echohl None
+    endif
+  else
+    hide
+  endif
+endfunction "}}}2
+function! g:PlugmaTabLabel(n) "{{{2
   " tabline にカレントウィンドウのバッファ名表示させたい
   let buflist = tabpagebuflist(a:n)
   " のでタブのなかのカレントウィンドの番号を使う
@@ -429,10 +429,8 @@ function! g:PlugmaTabLabel(n)
 
   " tabline に表示させる文字列返す
   return label
-endfunction
-" }}}2
-" FUNCTION g:PlugmaTabLine {{{2
-function! g:PlugmaTabLine()
+endfunction "}}}2
+function! g:PlugmaTabLine() "{{{2
   let s = ''
   for i in range(tabpagenr('$'))
     if i + 1 == tabpagenr()
@@ -448,23 +446,7 @@ function! g:PlugmaTabLine()
     let s .= '%=%#TabLine#%999Xx'
   endif
   return s
-endfunction
-" }}}2
-" FUNCTION s:PlugmaQuit {{{2
-function! s:PlugmaQuit()
-  if (tabpagenr("$") == 1) && (winnr("$") == 1)
-    if g:plugma_FUNC_Quit == 1
-      quit
-    else
-      echohl ErrorMsg
-      echo 'Last window is not closed.'
-      echohl None
-    endif
-  else
-    hide
-  endif
-endfunction
-" }}}2
+endfunction "}}}2
 " }}}1
 " COMMAND {{{1
 command! -nargs=0 PLToggleFullScreen call s:PlugmaToggleFullScreen()
@@ -476,4 +458,3 @@ command! -nargs=0 PLChangeDirectory call s:PlugmaChangeDirectory()
 command! -nargs=0 PLMoveDirectory call s:PlugmaMoveDirectory()
 command! -nargs=0 PLQuit call s:PlugmaQuit()
 " }}}1
-" vim:set foldenable foldmethod=marker:
