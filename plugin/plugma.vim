@@ -2,7 +2,7 @@
 "=============================================================================
 " FILE:plugma.vim
 " AUTHOR:Tomoaki, Arakawa
-" Last Change:2014/08/02 21:36:36.
+" Last Change:2014/08/02 23:22:12.
 " Version:0.1
 "
 "=============================================================================
@@ -13,8 +13,8 @@ endif
 let g:loaded_plugma = 1
 
 " }}}1
-" GLOBAL SETTINGS {{{1
-" Global Variable {{{2
+" SETTINGS {{{1
+" Variable {{{2
 "-----------------------------------------------------------------------------
 " Config
 "-----------------------------------------------------------------------------
@@ -71,26 +71,28 @@ let g:plugma_SelectCmd.fileformat = [
 	\ ['MAC(CR)'             , 'set fileformat=mac']   , 
 	\ ['UNIX(LF)'            , 'set fileformat=unix']]
 " }}}2
-" Global autocmd {{{2
+" autocmd {{{2
 "-----------------------------------------------------------------------------
-if g:plugma_AC_Perl == 1
-  autocmd FileType perl :map <F3> <Esc>:!perl -cw %<CR>
-  autocmd FileType perl :map <F4> <Esc>:!perl %<CR>
-endif
-if g:plugma_AC_Clang == 1
-  autocmd FileType c :map <F3> <Esc>:shell<CR>
-  autocmd FileType c :map <F4> <Esc>:make<CR>
-endif
-if g:plugma_AC_Ruby == 1
-  autocmd FileType ruby :map <F3> <Esc>:!ruby -c %<CR>
-  autocmd FileType ruby :map <F4> <Esc>:!ruby %<CR>
-endif
-if g:plugma_AC_PHP == 1
-  autocmd FileType php :map <F3> <Esc>:!php -l %<CR>
-  autocmd FileType php :map <F4> <Esc>:!php %<CR>
-endif
-" }}}2
-" Global Keymap {{{2
+function! s:Plugma_Init_AutoCmd()
+  if g:plugma_AC_Perl == 1
+    autocmd FileType perl :map <F3> <Esc>:!perl -cw %<CR>
+    autocmd FileType perl :map <F4> <Esc>:!perl %<CR>
+  endif
+  if g:plugma_AC_Clang == 1
+    autocmd FileType c :map <F3> <Esc>:shell<CR>
+    autocmd FileType c :map <F4> <Esc>:make<CR>
+  endif
+  if g:plugma_AC_Ruby == 1
+    autocmd FileType ruby :map <F3> <Esc>:!ruby -c %<CR>
+    autocmd FileType ruby :map <F4> <Esc>:!ruby %<CR>
+  endif
+  if g:plugma_AC_PHP == 1
+    autocmd FileType php :map <F3> <Esc>:!php -l %<CR>
+    autocmd FileType php :map <F4> <Esc>:!php %<CR>
+  endif
+endfunction
+"}}}2
+" Keymap {{{2
 "-----------------------------------------------------------------------------
 " Space & Moving
 nnoremap <silent><Space>h h
@@ -118,8 +120,8 @@ if g:plugma_GatesKeyBind == 1
   map  <C-V> "+gP
   cmap <C-V> <C-R>+
   nmap <C-V> "+gp
-  exe 'inoremap <script> <C-V>' paste#paste_cmd['i']
-  exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
+  exe 'inoremap <script> <C-V> <C-G>u' . paste#paste_cmd['i']
+  exe 'vnoremap <script> <C-V> ' . paste#paste_cmd['v']
 
   " Undo
   noremap <C-Z> u
@@ -198,43 +200,48 @@ nnoremap <silent><Space>pwd :pwd<CR>
 nnoremap <silent><Space>vm :marks<CR>
 " Show Registers
 nnoremap <silent><Space>vr :registers<CR>
-
 " }}}2
-" Global Status-Line {{{2
+" Status-Line {{{2
 "-----------------------------------------------------------------------------
-if g:plugma_SL_Default == 1
-  set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%y%=R%l,C%v%V%6P\ \<\ %L
-endif
-if g:plugma_SL_DateTime == 1
-  let &statusline .= ' [%{strftime("%Y/%m/%d_%H:%M")}]'
-endif
-if g:plugma_SL_CurDir == 1
-  let &statusline .= ' [%{getcwd()}]'
-endif
-" }}}2
-" Global Highlight {{{2
-if g:plugma_HL_Simple == 1
-  if !has('gui_running')
-    " Terminal Color
-    hi TabLine        ctermfg=15      ctermbg=0       cterm=none
-    hi TabLineSel     ctermfg=2       ctermbg=0       cterm=bold
-    hi TabLineFill    ctermfg=0       ctermbg=8       cterm=none
-    hi StatusLineNC   ctermfg=0       ctermbg=8       cterm=none
-    hi StatusLine     ctermfg=0       ctermbg=15      cterm=none
+function! s:Plugma_Init_StatusLine()
+  if g:plugma_SL_Default == 1
+    set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%y%=R%l,C%v%V%6P\ \<\ %L
   endif
-endif
+  if g:plugma_SL_DateTime == 1
+    let &statusline .= ' [%{strftime("%Y/%m/%d_%H:%M")}]'
+  endif
+  if g:plugma_SL_CurDir == 1
+    let &statusline .= ' [%{getcwd()}]'
+  endif
+endfunction
 " }}}2
-" Global Tab-Line {{{2
-if g:plugma_TL_Terminal == 1
-  if !has('gui_running')
+" Highlight {{{2
+function! s:Plugma_Init_Highlight()
+  if g:plugma_HL_Simple == 1
+    if !has('gui_running')
+      " Terminal Color
+      hi TabLine        ctermfg=15      ctermbg=0       cterm=none
+      hi TabLineSel     ctermfg=2       ctermbg=0       cterm=bold
+      hi TabLineFill    ctermfg=0       ctermbg=8       cterm=none
+      hi StatusLineNC   ctermfg=0       ctermbg=8       cterm=none
+      hi StatusLine     ctermfg=0       ctermbg=15      cterm=none
+    endif
+  endif
+endfunction
+" }}}2
+" Tab-Line {{{2
+function! s:Plugma_Init_TabLine()
+  if g:plugma_TL_Terminal == 1
+    "if !has('gui_running')
     set tabline=%!g:PlugmaTabLine()
     set showtabline=2
+    "endif
   endif
-endif
+endfunction
 " }}}2
 " }}}1
 " FUNCTION {{{1
-function! s:PlugmaToggleFullScreen() "{{{2
+function! s:Plugma_Toggle_FullScreen() "{{{2
   if has('win32')
     if &guioptions =~# 'C'
       set guioptions-=C
@@ -263,7 +270,7 @@ function! s:PlugmaToggleFullScreen() "{{{2
     endif
   endif
 endfunction "}}}2
-function! s:PlugmaToggleGuiOptions(flag_option) "{{{2
+function! s:Plugma_Toggle_GuiOptions(flag_option) "{{{2
   if has('gui_running')
     if a:flag_option ==? 'T' " ツールバーの表示/非表示
       if &guioptions =~# 'T'
@@ -318,7 +325,7 @@ function! s:PlugmaToggleGuiOptions(flag_option) "{{{2
     echo 'not gui_running.'
   endif
 endfunction "}}}2
-function! s:PlugmaToggleIncSearch() "{{{2
+function! s:Plugma_Toggle_IncSearch() "{{{2
   if &incsearch == 1
     set incsearch!
     echohl ErrorMsg
@@ -331,7 +338,7 @@ function! s:PlugmaToggleIncSearch() "{{{2
     echohl None
   endif
 endfunction "}}}2
-function! s:PlugmaSelectCmd(key) "{{{2
+function! s:Plugma_SelectCmd(key) "{{{2
   let a:viewlist = []
   let a:idx = 0
   let a:input = 0
@@ -366,14 +373,14 @@ function! s:PlugmaSelectCmd(key) "{{{2
 
   execute a:slist[a:input][1]
 endfunction "}}}2
-function! s:PlugmaSelectCmdComplete(ArgLead, CmdLine, CursorPos) "{{{2
+function! s:Plugma_SelectCmdComplete(ArgLead, CmdLine, CursorPos) "{{{2
   return keys(g:plugma_SelectCmd)
 endfunction "}}}2
-function! s:PlugmaChangeDirectory() "{{{2
+function! s:Plugma_ChangeDirectory() "{{{2
   cd %:h
   echo '>cd ' . expand('%:h')
 endfunction "}}}2
-function! s:PlugmaMoveDirectory() "{{{2
+function! s:Plugma_MoveDirectory() "{{{2
   let a:mv_path = input('Plz Input Dir > ' , expand("%:p:h") , "dir")
   echo "\n"
   if strlen(a:mv_path) < 1
@@ -393,7 +400,7 @@ function! s:PlugmaMoveDirectory() "{{{2
   execute 'cd ' . a:mv_path
   echo '>cd ' . a:mv_path
 endfunction "}}}2
-function! s:PlugmaQuit() "{{{2
+function! s:Plugma_Quit() "{{{2
   if (tabpagenr("$") == 1) && (winnr("$") == 1)
     if g:plugma_FUNC_Quit == 1
       quit
@@ -406,7 +413,7 @@ function! s:PlugmaQuit() "{{{2
     hide
   endif
 endfunction "}}}2
-function! g:PlugmaTabLabel(n) "{{{2
+function! g:Plugma_TabLabel(n) "{{{2
   " tabline にカレントウィンドウのバッファ名表示させたい
   let buflist = tabpagebuflist(a:n)
   " のでタブのなかのカレントウィンドの番号を使う
@@ -430,7 +437,7 @@ function! g:PlugmaTabLabel(n) "{{{2
   " tabline に表示させる文字列返す
   return label
 endfunction "}}}2
-function! g:PlugmaTabLine() "{{{2
+function! g:Plugma_TabLine() "{{{2
   let s = ''
   for i in range(tabpagenr('$'))
     if i + 1 == tabpagenr()
@@ -439,7 +446,7 @@ function! g:PlugmaTabLine() "{{{2
       let s .= '%#TabLine#'
     endif
     let s .= '%' . (i + 1) . 'T'
-    let s .= ' %{g:PlugmaTabLabel(' . (i + 1) . ')} '
+    let s .= ' %{g:Plugma_TabLabel(' . (i + 1) . ')} '
   endfor
   let s .= '%#TabLineFill#%T'
   if tabpagenr('$') > 1
@@ -447,14 +454,23 @@ function! g:PlugmaTabLine() "{{{2
   endif
   return s
 endfunction "}}}2
+function! s:Plugma_Startup() "{{{2
+  call s:Plugma_Init_AutoCmd()
+  call s:Plugma_Init_StatusLine()
+  call s:Plugma_Init_Highlight()
+  call s:Plugma_Init_TabLine()
+endfunction "}}}2
 " }}}1
 " COMMAND {{{1
-command! -nargs=0 PLToggleFullScreen call s:PlugmaToggleFullScreen()
-command! -nargs=1 PLToggleGuiOptions call s:PlugmaToggleGuiOptions(<q-args>)
-command! -nargs=0 PLToggleIncSearch call s:PlugmaToggleIncSearch()
-command! -nargs=1 -complete=customlist,s:PlugmaSelectCmdComplete PLSelectCmd 
-      \ call s:PlugmaSelectCmd(<q-args>)
-command! -nargs=0 PLChangeDirectory call s:PlugmaChangeDirectory()
-command! -nargs=0 PLMoveDirectory call s:PlugmaMoveDirectory()
-command! -nargs=0 PLQuit call s:PlugmaQuit()
+command! -nargs=0 PLToggleFullScreen call s:Plugma_Toggle_FullScreen()
+command! -nargs=1 PLToggleGuiOptions call s:Plugma_Toggle_GuiOptions(<q-args>)
+command! -nargs=0 PLToggleIncSearch call s:Plugma_Toggle_IncSearch()
+command! -nargs=1 -complete=customlist,s:Plugma_SelectCmdComplete PLSelectCmd 
+      \ call s:Plugma_SelectCmd(<q-args>)
+command! -nargs=0 PLChangeDirectory call s:Plugma_ChangeDirectory()
+command! -nargs=0 PLMoveDirectory call s:Plugma_MoveDirectory()
+command! -nargs=0 PLQuit call s:Plugma_Quit()
 " }}}1
+
+call s:Plugma_Startup()
+
