@@ -2,7 +2,7 @@
 "=============================================================================
 " FILE:plugma.vim
 " AUTHOR:Tomoaki, Arakawa
-" Last Change:2014/08/02 23:22:12.
+" Last Change:2014/08/10 04:09:20.
 " Version:0.1
 "
 "=============================================================================
@@ -19,28 +19,54 @@ let g:loaded_plugma = 1
 " Config
 "-----------------------------------------------------------------------------
 " Key-bind Support
-let g:plugma_GatesKeyBind     = 1 " default value is 1
-let g:plugma_DirectTabSelect  = 1 " default value is 1
-let g:plugma_EmaceLikeKeyBind = 0 " default value is 0
+if !exists('g:plugma_GatesKeyBind')
+  let g:plugma_GatesKeyBind     = 1 " default value is 1
+endif
+if !exists('g:plugma_DirectTabSelect')
+  let g:plugma_DirectTabSelect  = 1 " default value is 1
+endif
+if !exists('g:plugma_EmaceLikeKeyBind')
+  let g:plugma_EmaceLikeKeyBind = 0 " default value is 0
+endif
 " FileType Support.
-let g:plugma_AC_Clang         = 1 " default value is 1
-let g:plugma_AC_Perl          = 1 " default value is 1
-let g:plugma_AC_PHP           = 1 " default value is 1
-let g:plugma_AC_Ruby          = 1 " default value is 1
+if !exists('g:plugma_AC_Clang')
+  let g:plugma_AC_Clang         = 1 " default value is 1
+endif
+if !exists('g:plugma_AC_Perl')
+  let g:plugma_AC_Perl          = 1 " default value is 1
+endif
+if !exists('g:plugma_AC_PHP')
+  let g:plugma_AC_PHP           = 1 " default value is 1
+endif
+if !exists('g:plugma_AC_Ruby')
+  let g:plugma_AC_Ruby          = 1 " default value is 1
+endif
 
 " Status-Line Support
-let g:plugma_SL_Default       = 1 " default value is 1
-let g:plugma_SL_DateTime      = 1 " default value is 1
-let g:plugma_SL_CurDir        = 0 " default value is 0
+if !exists('g:plugma_SL_Default')
+  let g:plugma_SL_Default       = 1 " default value is 1
+endif
+if !exists('g:plugma_SL_DateTime')
+  let g:plugma_SL_DateTime      = 1 " default value is 1
+endif
+if !exists('g:plugma_SL_CurDir')
+  let g:plugma_SL_CurDir        = 0 " default value is 0
+endif
 
 " Hilight Support
-let g:plugma_HL_Simple        = 1 " default value is 1
+if !exists('g:plugma_HL_Simple')
+  let g:plugma_HL_Simple        = 1 " default value is 1
+endif
 
 " Tabline Support
-let g:plugma_TL_Terminal      = 0 " default value is 0
+if !exists('g:plugma_TL_Terminal')
+  let g:plugma_TL_Terminal      = 0 " default value is 0
+endif
 
 " Function Support
-let g:plugma_FUNC_Quit        = 0 " default value is 0
+if !exists('g:plugma_FUNC_Quit')
+  let g:plugma_FUNC_Quit        = 0 " default value is 0
+endif
 " Config 
 "-----------------------------------------------------------------------------
 let g:plugma_SelectCmd = {}
@@ -233,7 +259,7 @@ endfunction
 function! s:Plugma_Init_TabLine()
   if g:plugma_TL_Terminal == 1
     "if !has('gui_running')
-    set tabline=%!g:PlugmaTabLine()
+    set tabline=%!g:Plugma_TabLine()
     set showtabline=2
     "endif
   endif
