@@ -2,7 +2,7 @@
 "=============================================================================
 " FILE:plugma.vim
 " AUTHOR:Tomoaki, Arakawa
-" Last Change:2014/08/10 04:09:20.
+" Last Change:2014/11/24 13:07:25.
 " Version:0.1
 "
 "=============================================================================
@@ -25,8 +25,8 @@ endif
 if !exists('g:plugma_DirectTabSelect')
   let g:plugma_DirectTabSelect  = 1 " default value is 1
 endif
-if !exists('g:plugma_EmaceLikeKeyBind')
-  let g:plugma_EmaceLikeKeyBind = 0 " default value is 0
+if !exists('g:plugma_EmacsLikeKeyBind')
+  let g:plugma_EmacsLikeKeyBind = 0 " default value is 0
 endif
 " FileType Support.
 if !exists('g:plugma_AC_Clang')
@@ -159,7 +159,7 @@ if g:plugma_GatesKeyBind == 1
 endif
 
 " Emacs Keybind
-if g:plugma_EmaceLikeKeyBind == 1
+if g:plugma_EmacsLikeKeyBind == 1
   nnoremap <C-X>1 :only<CR>
   nnoremap <C-X>2 :split<CR>
   nnoremap <C-X>3 :vsplit<CR>
@@ -258,10 +258,10 @@ endfunction
 " Tab-Line {{{2
 function! s:Plugma_Init_TabLine()
   if g:plugma_TL_Terminal == 1
-    "if !has('gui_running')
-    set tabline=%!g:Plugma_TabLine()
-    set showtabline=2
-    "endif
+    if !has('gui_running')
+      set tabline=%!g:Plugma_TabLine()
+      set showtabline=2
+    endif
   endif
 endfunction
 " }}}2
